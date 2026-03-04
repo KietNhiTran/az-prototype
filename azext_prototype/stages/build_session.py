@@ -1122,7 +1122,7 @@ class BuildSession:
             "set this flag.\n\n"
             "Return ONLY valid JSON:\n"
             "```json\n"
-            '{\n'
+            "{\n"
             '  "unchanged": [1, 2],\n'
             '  "modified": [3],\n'
             '  "removed": [4],\n'
@@ -1131,7 +1131,7 @@ class BuildSession:
             '"Microsoft.Cache/redis", "sku": "Basic"}]}],\n'
             '  "plan_restructured": false,\n'
             '  "summary": "Added Redis cache; modified API to use Redis"\n'
-            '}\n'
+            "}\n"
             "```\n"
         )
 
@@ -1185,12 +1185,14 @@ class BuildSession:
         normalised_added = []
         for item in added:
             if isinstance(item, dict) and item.get("name"):
-                normalised_added.append({
-                    "name": item["name"],
-                    "category": item.get("category", "infra"),
-                    "services": item.get("services", []),
-                    "dir": item.get("dir", ""),
-                })
+                normalised_added.append(
+                    {
+                        "name": item["name"],
+                        "category": item.get("category", "infra"),
+                        "services": item.get("services", []),
+                        "dir": item.get("dir", ""),
+                    }
+                )
 
         return {
             "unchanged": sorted(unchanged),
@@ -1878,9 +1880,7 @@ class BuildSession:
         return "\n\n".join(parts)
 
     @contextmanager
-    def _maybe_spinner(
-        self, message: str, use_styled: bool, *, status_fn: Callable | None = None
-    ) -> Iterator[None]:
+    def _maybe_spinner(self, message: str, use_styled: bool, *, status_fn: Callable | None = None) -> Iterator[None]:
         """Show a spinner when using styled output, otherwise no-op."""
         if use_styled:
             with self._console.spinner(message):

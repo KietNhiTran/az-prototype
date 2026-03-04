@@ -33,6 +33,7 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
 )
+
 from azext_prototype.ui.theme import COLORS, PT_STYLE_DICT, RICH_THEME
 
 THEME = RICH_THEME

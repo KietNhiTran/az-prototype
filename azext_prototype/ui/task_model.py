@@ -21,10 +21,10 @@ class TaskStatus(enum.Enum):
 
 # Status → display symbol mapping
 STATUS_SYMBOLS = {
-    TaskStatus.PENDING: "\u25cb",      # ○
+    TaskStatus.PENDING: "\u25cb",  # ○
     TaskStatus.IN_PROGRESS: "\u25cf",  # ●
-    TaskStatus.COMPLETED: "\u2713",    # ✓
-    TaskStatus.FAILED: "\u2717",       # ✗
+    TaskStatus.COMPLETED: "\u2713",  # ✓
+    TaskStatus.FAILED: "\u2717",  # ✗
 }
 
 

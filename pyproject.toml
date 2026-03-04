@@ -8,6 +8,7 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "-v --tb=short -q"
+asyncio_mode = "strict"
 
 [tool.coverage.run]
 source = ["azext_prototype"]

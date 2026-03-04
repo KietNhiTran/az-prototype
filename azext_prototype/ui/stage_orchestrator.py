@@ -121,7 +121,10 @@ class StageOrchestrator:
                 prefix = "  Summary:    "
                 indent = " " * len(prefix)
                 wrapped = textwrap.fill(
-                    summary, width=80, initial_indent=prefix, subsequent_indent=indent,
+                    summary,
+                    width=80,
+                    initial_indent=prefix,
+                    subsequent_indent=indent,
                 )
                 for line in wrapped.splitlines():
                     pf(line)
@@ -219,14 +222,16 @@ class StageOrchestrator:
 
             if confirmed > 0:
                 self._adapter.add_task(
-                    "design", "design-confirmed",
+                    "design",
+                    "design-confirmed",
                     f"Confirmed requirements ({confirmed})",
                 )
                 self._adapter.update_task("design-confirmed", TaskStatus.COMPLETED)
 
             if open_count > 0:
                 self._adapter.add_task(
-                    "design", "design-open",
+                    "design",
+                    "design-open",
                     f"Open items ({open_count})",
                 )
                 # Open items are pending resolution
@@ -236,7 +241,8 @@ class StageOrchestrator:
             design_json = Path(self._project_dir) / ".prototype" / "state" / "design.json"
             if design_json.exists():
                 self._adapter.add_task(
-                    "design", "design-arch",
+                    "design",
+                    "design-arch",
                     "Architecture document",
                 )
                 self._adapter.update_task("design-arch", TaskStatus.COMPLETED)

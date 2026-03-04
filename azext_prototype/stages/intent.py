@@ -475,7 +475,10 @@ def build_build_classifier(
                 command="/files",
                 keywords=[],
                 phrases=["generated files", "show files", "list files", "what files"],
-                regex_patterns=[r"(?:show|list|display)\s+(?:me\s+)?(?:the\s+)?(?:generated\s+)?files", r"what(?:'s| are)\s+(?:the\s+)?(?:generated\s+)?files"],
+                regex_patterns=[
+                    r"(?:show|list|display)\s+(?:me\s+)?(?:the\s+)?(?:generated\s+)?files",
+                    r"what(?:'s| are)\s+(?:the\s+)?(?:generated\s+)?files",
+                ],
             ),
             IntentPattern(
                 command="/policy",
@@ -533,9 +536,11 @@ def build_deploy_classifier(
                     r"deploy\s+stages?\s+\d+(?:\s+and\s+\d+)*",
                     r"deploy\s+all",
                 ],
-                arg_extractor=lambda t: _extract_stage_numbers(t) or "all"
-                if re.search(r"\ball\b", t, re.IGNORECASE)
-                else _extract_stage_numbers(t),
+                arg_extractor=lambda t: (
+                    _extract_stage_numbers(t) or "all"
+                    if re.search(r"\ball\b", t, re.IGNORECASE)
+                    else _extract_stage_numbers(t)
+                ),
             ),
             IntentPattern(
                 command="/rollback",
@@ -549,9 +554,7 @@ def build_deploy_classifier(
                     r"undo\s+(?:stage\s+)?\d+",
                     r"undo\s+(?:the\s+)?deploy",
                 ],
-                arg_extractor=lambda t: "all"
-                if re.search(r"\ball\b", t, re.IGNORECASE)
-                else _extract_stage_numbers(t),
+                arg_extractor=lambda t: "all" if re.search(r"\ball\b", t, re.IGNORECASE) else _extract_stage_numbers(t),
             ),
             IntentPattern(
                 command="/redeploy",

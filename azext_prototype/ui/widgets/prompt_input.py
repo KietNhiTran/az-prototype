@@ -140,7 +140,7 @@ class PromptInput(TextArea):
         """Strip the prefix, post the Submitted message, and reset."""
         raw = self.text
         if raw.startswith(_PROMPT_PREFIX):
-            raw = raw[len(_PROMPT_PREFIX):]
+            raw = raw[len(_PROMPT_PREFIX) :]
         value = raw.strip()
         if value or self._allow_empty:
             self.post_message(self.Submitted(value))

@@ -170,7 +170,9 @@ class DesignStage(BaseStage):
                         _print(f"    [bright_green]\u2713[/bright_green] [bright_cyan]{name}[/bright_cyan]")
 
             if artifact_images:
-                _print(f"  [bright_cyan]\u2192[/bright_cyan] Extracted {len(artifact_images)} image(s) for vision analysis")
+                _print(
+                    f"  [bright_cyan]\u2192[/bright_cyan] Extracted {len(artifact_images)} image(s) for vision analysis"
+                )
 
             if result["failed"]:
                 _print(f"  Could not read {len(result['failed'])} file(s):")
@@ -387,8 +389,13 @@ class DesignStage(BaseStage):
             ui.print_dim("  az prototype analyze costs                    # Cost estimate")
             ui.print_dim("  az prototype build                            # Generate code")
         else:
-            _print(f"[bold bright_green]\u2714[/bold bright_green] Design iteration {design_state['iteration']} complete.")
-            _print("[bright_cyan]\u2192[/bright_cyan] Architecture docs: [bright_cyan]concept/docs/ARCHITECTURE.md[/bright_cyan]")
+            _print(
+                f"[bold bright_green]\u2714[/bold bright_green] Design iteration {design_state['iteration']} complete."
+            )
+            _print(
+                "[bright_cyan]\u2192[/bright_cyan] Architecture docs:"
+                " [bright_cyan]concept/docs/ARCHITECTURE.md[/bright_cyan]"
+            )
             _print("\n[dim]Next steps:[/dim]")
             _print("[dim]  az prototype design --context 'your changes'  # Refine[/dim]")
             _print("[dim]  az prototype analyze costs                    # Cost estimate[/dim]")

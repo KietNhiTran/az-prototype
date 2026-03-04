@@ -981,9 +981,7 @@ class BacklogSession:
             return ""
 
     @contextmanager
-    def _maybe_spinner(
-        self, message: str, use_styled: bool, *, status_fn: Callable | None = None
-    ) -> Iterator[None]:
+    def _maybe_spinner(self, message: str, use_styled: bool, *, status_fn: Callable | None = None) -> Iterator[None]:
         """Show a spinner when using styled output, otherwise no-op."""
         if use_styled:
             with self._console.spinner(message):

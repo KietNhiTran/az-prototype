@@ -151,9 +151,11 @@ class TUIAdapter:
         if self._shutdown.is_set():
             return
         try:
+
             def _render():
                 self._app.console_view.write_agent_response(content)
                 self._request_screen_update()
+
             self._app.call_from_thread(_render)
         except Exception:
             pass
@@ -231,13 +233,15 @@ class TUIAdapter:
             return
 
         if event == "start":
+
             def _start() -> None:
                 self._cancel_timer()
                 self._timer_start = time.monotonic()
                 self._app.info_bar.update_assist(f"\u23f3 {message}")
                 self._app.info_bar.update_status("\u23f1 0s")
                 self._timer_handle = self._app.set_interval(
-                    1.0, self._tick_timer,
+                    1.0,
+                    self._tick_timer,
                 )
                 self._request_screen_update()
 
@@ -247,15 +251,14 @@ class TUIAdapter:
                 pass
 
         elif event == "end":
+
             def _stop() -> None:
                 self._cancel_timer()
                 if self._timer_start is not None:
                     elapsed = time.monotonic() - self._timer_start
                     self._app.info_bar.update_status(f"\u23f1 {_format_elapsed(elapsed)}")
                 self._timer_start = None
-                self._app.info_bar.update_assist(
-                    "Enter = submit | Ctrl+J = newline | Ctrl+C = quit"
-                )
+                self._app.info_bar.update_assist("Enter = submit | Ctrl+J = newline | Ctrl+C = quit")
                 self._request_screen_update()
 
             try:
@@ -264,6 +267,7 @@ class TUIAdapter:
                 pass
 
         elif event == "tokens":
+
             def _tokens() -> None:
                 if message:
                     self._app.info_bar.update_status(message)

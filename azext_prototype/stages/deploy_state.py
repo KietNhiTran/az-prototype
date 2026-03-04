@@ -425,11 +425,7 @@ class DeployState:
 
     def get_stages_for_build_stage(self, build_stage_id: str) -> list[dict]:
         """Return all deploy stages linked to a given build stage."""
-        return [
-            s
-            for s in self._state["deployment_stages"]
-            if s.get("build_stage_id") == build_stage_id
-        ]
+        return [s for s in self._state["deployment_stages"] if s.get("build_stage_id") == build_stage_id]
 
     def get_stage_by_display_id(self, display_id: str) -> dict | None:
         """Parse a display ID like ``"5"`` or ``"5a"`` and return the matching stage.

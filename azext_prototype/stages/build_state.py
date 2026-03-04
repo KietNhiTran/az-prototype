@@ -306,16 +306,12 @@ class BuildState:
             if stage["stage"] in nums_set:
                 removed_files.extend(stage.get("files", []))
 
-        self._state["deployment_stages"] = [
-            s for s in self._state["deployment_stages"] if s["stage"] not in nums_set
-        ]
+        self._state["deployment_stages"] = [s for s in self._state["deployment_stages"] if s["stage"] not in nums_set]
 
         # Remove from files_generated
         if removed_files:
             removed_set = set(removed_files)
-            self._state["files_generated"] = [
-                f for f in self._state["files_generated"] if f not in removed_set
-            ]
+            self._state["files_generated"] = [f for f in self._state["files_generated"] if f not in removed_set]
 
         self._rebuild_resources()
         self.save()

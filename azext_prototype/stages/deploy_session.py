@@ -579,7 +579,11 @@ class DeploySession:
 
             # Attempt non-interactive remediation
             remediated = self._remediate_deploy_failure(
-                stage, result, False, _print, lambda p: "",
+                stage,
+                result,
+                False,
+                _print,
+                lambda p: "",
             )
             if remediated and remediated.get("status") == "deployed":
                 _print(f"  Stage {stage_num} deployed after remediation.")
@@ -1295,9 +1299,9 @@ class DeploySession:
             normalized = filename.replace("\\", "/")
             stage_prefix = stage_dir.replace("\\", "/")
             if normalized.startswith(stage_prefix + "/"):
-                normalized = normalized[len(stage_prefix) + 1:]
+                normalized = normalized[len(stage_prefix) + 1 :]
             elif normalized.startswith(stage_prefix):
-                normalized = normalized[len(stage_prefix):]
+                normalized = normalized[len(stage_prefix) :]
             normalized = normalized or filename
 
             if normalized in blocked:
@@ -1356,9 +1360,7 @@ class DeploySession:
         except Exception:
             logger.debug("Could not sync build state after remediation", exc_info=True)
 
-    def _get_architect_fix_guidance(
-        self, stage: dict, deploy_error: str, qa_diagnosis: str
-    ) -> str:
+    def _get_architect_fix_guidance(self, stage: dict, deploy_error: str, qa_diagnosis: str) -> str:
         """Ask the architect agent for specific fix guidance.
 
         Returns guidance text, or a generic fallback if no architect is available.
@@ -1399,9 +1401,7 @@ class DeploySession:
 
         return "Fix the issues identified in the QA diagnosis. Ensure all resource references are correct."
 
-    def _check_downstream_impact(
-        self, fixed_stage: dict, architect_guidance: str
-    ) -> list[int]:
+    def _check_downstream_impact(self, fixed_stage: dict, architect_guidance: str) -> list[int]:
         """Ask the architect whether downstream stages need regeneration.
 
         Returns a list of stage numbers that should be regenerated, or
@@ -1414,10 +1414,7 @@ class DeploySession:
         fixed_num = fixed_stage["stage"]
 
         # Only consider downstream stages that are pending or failed
-        downstream = [
-            s for s in stages
-            if s["stage"] > fixed_num and s.get("deploy_status") in ("pending", "failed")
-        ]
+        downstream = [s for s in stages if s["stage"] > fixed_num and s.get("deploy_status") in ("pending", "failed")]
         if not downstream:
             return []
 
@@ -2089,9 +2086,7 @@ class DeploySession:
         )
 
     @contextmanager
-    def _maybe_spinner(
-        self, message: str, use_styled: bool, *, status_fn: Callable | None = None
-    ) -> Iterator[None]:
+    def _maybe_spinner(self, message: str, use_styled: bool, *, status_fn: Callable | None = None) -> Iterator[None]:
         """Show a spinner when using styled output, otherwise no-op."""
         if use_styled:
             with self._console.spinner(message):

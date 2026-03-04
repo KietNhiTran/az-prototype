@@ -52,11 +52,18 @@ _SECTION_HEADING_RE = re.compile(r"^#{2,3}\s+(.+?)\s*$", re.MULTILINE)
 # Matches **Bold Heading** on its own line (common in conversational responses)
 _BOLD_HEADING_RE = re.compile(r"^\*\*([^*\n]{3,60})\*\*\s*$", re.MULTILINE)
 
-_SKIP_HEADINGS = frozenset({
-    "summary", "policy overrides", "policy override", "next steps",
-    "what i've understood so far", "what we've covered",
-    "what i've understood", "what we've established",
-})
+_SKIP_HEADINGS = frozenset(
+    {
+        "summary",
+        "policy overrides",
+        "policy override",
+        "next steps",
+        "what i've understood so far",
+        "what we've covered",
+        "what i've understood",
+        "what we've established",
+    }
+)
 
 
 def extract_section_headers(response: str) -> list[tuple[str, int]]:
@@ -100,9 +107,9 @@ class Section:
     """A parsed section from an AI response."""
 
     heading: str
-    level: int       # 2=##, 3=###
-    content: str     # text from heading to next heading (includes heading line)
-    task_id: str     # "design-section-{slug}"
+    level: int  # 2=##, 3=###
+    content: str  # text from heading to next heading (includes heading line)
+    task_id: str  # "design-section-{slug}"
 
 
 def parse_sections(response: str) -> tuple[str, list[Section]]:
@@ -268,9 +275,7 @@ class DiscoverySession:
     # ------------------------------------------------------------------ #
 
     @contextmanager
-    def _maybe_spinner(
-        self, message: str, use_styled: bool, *, status_fn: Callable | None = None
-    ) -> Iterator[None]:
+    def _maybe_spinner(self, message: str, use_styled: bool, *, status_fn: Callable | None = None) -> Iterator[None]:
         """Show a spinner when using styled output, otherwise no-op."""
         if use_styled:
             with self._console.spinner(message):
@@ -314,16 +319,19 @@ class DiscoverySession:
             if text:
                 parts.append({"type": "text", "text": f"Here are the files I'd like you to review:\n\n{text}"})
             for img in images:
-                parts.append({"type": "image_url", "image_url": {"url": f"data:{img['mime']};base64,{img['data']}", "detail": "high"}})
+                parts.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{img['mime']};base64,{img['data']}", "detail": "high"},
+                    }
+                )
             content = parts if parts else text
         elif text:
             content = f"Here are the files I'd like you to review:\n\n{text}"
         self._exchange_count += 1
         with self._maybe_spinner("Analyzing files...", use_styled, status_fn=self._status_fn):
             response = self._chat(content)
-        self._discovery_state.update_from_exchange(
-            f"[Read files from {args}]", response, self._exchange_count
-        )
+        self._discovery_state.update_from_exchange(f"[Read files from {args}]", response, self._exchange_count)
         self._extract_items_from_response(response)
         clean = self._clean(response)
         self._show_content(clean, use_styled, _print)
@@ -400,7 +408,7 @@ class DiscoverySession:
                 prompt = (
                     f"The user answered about **{topic}**: {user_input}\n"
                     f"Do you have follow-up questions about **{topic}**? "
-                    f"If fully covered, respond ONLY with the word \"Yes\" "
+                    f'If fully covered, respond ONLY with the word "Yes" '
                     f"(meaning yes, this section is complete). "
                     f"Otherwise, ask your follow-up questions."
                 )
