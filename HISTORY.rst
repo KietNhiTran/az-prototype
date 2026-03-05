@@ -3,6 +3,22 @@
 Release History
 ===============
 
+0.2.1b5
++++++++
+
+TUI post-design improvements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* **Removed CLI "Next steps" from TUI** — the ``az prototype`` CLI
+  commands block is no longer printed into the TUI console after
+  architecture generation; replaced with a continuation prompt.
+* **"continue" launches build** — typing ``continue`` after design
+  completes now starts the build stage, matching the prompt text.
+* **Reduced console noise** — removed extra blank lines between
+  "Planning...", "Generating architecture...", and feasibility
+  check messages in the TUI output.
+* **Feasibility wording** — changed "Reviewing {iac} feasibility..."
+  to "Confirming {iac} feasibility..." and removed the arrow prefix.
+
 0.2.1b4
 +++++++
 

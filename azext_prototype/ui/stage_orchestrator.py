@@ -328,7 +328,7 @@ class StageOrchestrator:
                 break
             elif user_input in ("design", "redesign"):
                 self._run_design()
-            elif user_input == "build":
+            elif user_input in ("build", "continue"):
                 self._run_build()
             elif user_input in ("deploy", "redeploy"):
                 self._run_deploy()
