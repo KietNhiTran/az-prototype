@@ -890,6 +890,35 @@ class TestPrototypeAnalyzeCosts:
             prototype_analyze_costs(cmd)
 
 
+class TestExtractCostTable:
+    """Test _extract_cost_table helper."""
+
+    def test_extracts_summary_table(self):
+        from azext_prototype.custom import _extract_cost_table
+
+        content = (
+            "# Executive Summary\n\nSome intro text.\n\n---\n\n"
+            "## Cost Summary Table\n\n"
+            " Service         Small    Medium    Large\n"
+            " ──────────────────────────────────────────\n"
+            " App Service     $0.00    $13.14    $74.00\n"
+            " TOTAL           $0.00    $13.14    $74.00\n"
+            "\n\n---\n\n"
+            "## T-Shirt Size Definitions\n\nMore details...\n"
+        )
+        result = _extract_cost_table(content)
+        assert "Cost Summary Table" in result
+        assert "$13.14" in result
+        assert "T-Shirt Size" not in result
+
+    def test_fallback_on_no_heading(self):
+        from azext_prototype.custom import _extract_cost_table
+
+        content = "No table here, just text about the architecture."
+        result = _extract_cost_table(content)
+        assert result == content
+
+
 class TestPrototypeConfigSet:
     """Additional config set tests."""
 
@@ -1280,7 +1309,7 @@ class TestAnalyzeCostsCache:
         mock_prep.return_value = self._make_mock_prep(project_with_design, registry, mock_ctx)
 
         cmd = MagicMock()
-        result = prototype_analyze_costs(cmd, output_format="json", refresh=False, json_output=True)
+        result = prototype_analyze_costs(cmd, refresh=False, json_output=True)
 
         assert result["status"] == "analyzed"
         agent.execute.assert_called_once()
@@ -1310,14 +1339,14 @@ class TestAnalyzeCostsCache:
         cache_data = {
             "context_hash": context_hash,
             "content": "Cached cost report content",
-            "result": {"status": "analyzed", "agent": "cost-analyst", "format": "markdown"},
+            "result": {"status": "analyzed", "agent": "cost-analyst"},
             "timestamp": "2026-01-01T00:00:00+00:00",
         }
         cache_path = project_with_design / ".prototype" / "state" / "cost_analysis.yaml"
         cache_path.write_text(_yaml.dump(cache_data, default_flow_style=False), encoding="utf-8")
 
         cmd = MagicMock()
-        result = prototype_analyze_costs(cmd, output_format="markdown", refresh=False, json_output=True)
+        result = prototype_analyze_costs(cmd, refresh=False, json_output=True)
 
         assert result["status"] == "analyzed"
         agent.execute.assert_not_called()  # Should NOT have called the agent
@@ -1343,13 +1372,13 @@ class TestAnalyzeCostsCache:
         cache_data = {
             "context_hash": context_hash,
             "content": "Old cached content",
-            "result": {"status": "analyzed", "agent": "cost-analyst", "format": "markdown"},
+            "result": {"status": "analyzed", "agent": "cost-analyst"},
         }
         cache_path = project_with_design / ".prototype" / "state" / "cost_analysis.yaml"
         cache_path.write_text(_yaml.dump(cache_data, default_flow_style=False), encoding="utf-8")
 
         cmd = MagicMock()
-        result = prototype_analyze_costs(cmd, output_format="json", refresh=True, json_output=True)
+        result = prototype_analyze_costs(cmd, refresh=True, json_output=True)
 
         assert result["status"] == "analyzed"
         agent.execute.assert_called_once()  # Should HAVE called the agent
@@ -1369,13 +1398,13 @@ class TestAnalyzeCostsCache:
         cache_data = {
             "context_hash": "stale_hash_0000",
             "content": "Stale cached content",
-            "result": {"status": "analyzed", "agent": "cost-analyst", "format": "markdown"},
+            "result": {"status": "analyzed", "agent": "cost-analyst"},
         }
         cache_path = project_with_design / ".prototype" / "state" / "cost_analysis.yaml"
         cache_path.write_text(_yaml.dump(cache_data, default_flow_style=False), encoding="utf-8")
 
         cmd = MagicMock()
-        result = prototype_analyze_costs(cmd, output_format="json", refresh=False, json_output=True)
+        result = prototype_analyze_costs(cmd, refresh=False, json_output=True)
 
         assert result["status"] == "analyzed"
         agent.execute.assert_called_once()  # Stale cache — must re-run
@@ -1392,7 +1421,7 @@ class TestAnalyzeCostsCache:
         mock_prep.return_value = self._make_mock_prep(project_with_design, registry, mock_ctx)
 
         cmd = MagicMock()
-        prototype_analyze_costs(cmd, output_format="json", refresh=False)
+        prototype_analyze_costs(cmd, refresh=False)
 
         cache_path = project_with_design / ".prototype" / "state" / "cost_analysis.yaml"
         assert cache_path.exists()
@@ -1483,7 +1512,7 @@ class TestAnalyzeConsoleOutput:
         mock_prep.return_value = (str(project_with_design), config, registry, mock_ctx)
 
         cmd = MagicMock()
-        result = prototype_analyze_costs(cmd, output_format="json", refresh=True, json_output=True)
+        result = prototype_analyze_costs(cmd, refresh=True, json_output=True)
 
         assert result["status"] == "analyzed"
 

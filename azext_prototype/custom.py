@@ -2178,7 +2178,7 @@ def prototype_analyze_error(cmd, input=None, json_output=False):
 
 @_quiet_output
 @track("prototype analyze costs")
-def prototype_analyze_costs(cmd, output_format="markdown", refresh=False, json_output=False):
+def prototype_analyze_costs(cmd, table=False, report=False, refresh=False, json_output=False):
     """Analyze architecture costs at Small/Medium/Large t-shirt sizes.
 
     Results are cached in ``.prototype/state/cost_analysis.yaml``.
@@ -2212,43 +2212,132 @@ def prototype_analyze_costs(cmd, output_format="markdown", refresh=False, json_o
         try:
             cached = _yaml.safe_load(cache_path.read_text(encoding="utf-8"))
             if isinstance(cached, dict) and cached.get("context_hash") == context_hash:
-                console.print_header("Cost Analysis (cached)")
-                console.print_dim("Using cached results. Run with --refresh to regenerate.")
-                console.print_agent_response(cached["content"])
-                return cached.get("result", {"status": "analyzed", "agent": cost_agent.name, "format": output_format})
+                if not json_output:
+                    console.print_header("Cost Analysis (cached)")
+                    console.print_dim("Using cached results. Run with --refresh to regenerate.")
+                    _display_cost_content(console, cached["content"], table=table, report=report)
+                # Save markdown file (unless --table or --json)
+                if not table and not report and not json_output:
+                    _save_cost_report(project_dir, cached["content"], console)
+                return {
+                    "status": "analyzed",
+                    "agent": cost_agent.name,
+                    "cached": True,
+                    "content": cached["content"],
+                }
         except Exception:
             pass  # Corrupted cache — fall through to fresh analysis
 
-    console.print_header("Cost Analysis")
-    console.print_info("Querying Azure Retail Prices API...")
+    if not json_output:
+        console.print_header("Cost Analysis")
+        console.print_info("Querying Azure Retail Prices API...")
 
     task = (
-        "Analyze the costs for this Azure architecture at three t-shirt sizes.\n\n" f"## Architecture\n{design_context}"
+        "Analyze the costs for this Azure architecture at three t-shirt sizes." "\n\n## Architecture\n" + design_context
     )
 
     response = cost_agent.execute(agent_context, task)
 
-    console.print_agent_response(response.content)
+    if not json_output:
+        _display_cost_content(console, response.content, table=table, report=report)
 
-    # Write to file
-    if output_format == "markdown":
-        report_path = Path(project_dir) / "concept" / "docs" / "COST_ESTIMATE.md"
-        report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(response.content, encoding="utf-8")
-        console.print_success("Cost report saved to concept/docs/COST_ESTIMATE.md")
+    # Write to file (skip when --table or --json)
+    if not table and not report and not json_output:
+        _save_cost_report(project_dir, response.content, console)
 
     # Save to cache
-    result = {"status": "analyzed", "agent": cost_agent.name, "format": output_format}
     cache_data = {
         "context_hash": context_hash,
         "content": response.content,
-        "result": result,
+        "result": {"status": "analyzed", "agent": cost_agent.name},
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(_yaml.dump(cache_data, default_flow_style=False), encoding="utf-8")
 
-    return result
+    return {
+        "status": "analyzed",
+        "agent": cost_agent.name,
+        "cached": False,
+        "content": response.content,
+    }
+
+
+def _extract_cost_table(content: str) -> str:
+    """Extract the cost summary table section from a cost report.
+
+    Looks for a section containing a table-like structure (lines with $
+    amounts) and returns it.  Falls back to the full content if no table
+    is found.
+    """
+    import re
+
+    lines = content.splitlines()
+
+    # Strategy: find the block of lines that form the summary table.
+    # The table typically has a heading like "Cost Summary Table" or
+    # "Summary" followed by lines with dollar amounts and a TOTAL row.
+    table_start = None
+    table_end = None
+
+    for i, line in enumerate(lines):
+        # Look for a heading that signals the summary table
+        lower = line.lower().strip()
+        if "cost summary" in lower or (lower.startswith("#") and "summary" in lower and "table" in lower):
+            table_start = i
+            continue
+
+        # If we found the heading, look for the end of the table block
+        if table_start is not None and table_end is None:
+            # A horizontal rule or a new major heading ends the table
+            if (
+                re.match(r"^-{3,}$", line.strip())
+                or re.match(r"^#{1,3}\s", line.strip())
+                or (line.strip().startswith("T-Shirt") and i > table_start + 3)
+            ):
+                table_end = i
+                break
+
+    if table_start is not None:
+        end = table_end or len(lines)
+        # Trim trailing blank lines
+        section = lines[table_start:end]
+        while section and not section[-1].strip():
+            section.pop()
+        return "\n".join(section)
+
+    # Fallback: look for lines containing $ and TOTAL
+    dollar_lines = [i for i, line in enumerate(lines) if "$" in line]
+    if dollar_lines:
+        # Include a few lines before the first $ line for headers
+        start = max(0, dollar_lines[0] - 5)
+        # Find the TOTAL line
+        total_line = None
+        for i in dollar_lines:
+            if "total" in lines[i].lower():
+                total_line = i
+        end = (total_line + 1) if total_line else (dollar_lines[-1] + 1)
+        return "\n".join(lines[start:end])
+
+    return content
+
+
+def _display_cost_content(console, content: str, *, table: bool, report: bool) -> None:
+    """Display cost content based on flags."""
+    if report:
+        console.print_agent_response(content)
+    else:
+        # Default and --table both show just the summary table
+        summary = _extract_cost_table(content)
+        console.print_agent_response(summary)
+
+
+def _save_cost_report(project_dir: str, content: str, console) -> None:
+    """Save the full cost report to concept/docs/COST_ESTIMATE.md."""
+    report_path = Path(project_dir) / "concept" / "docs" / "COST_ESTIMATE.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(content, encoding="utf-8")
+    console.print_success("Cost report saved to concept/docs/COST_ESTIMATE.md")
 
 
 def _load_design_context(project_dir: str) -> str:
@@ -2617,7 +2706,7 @@ def prototype_generate_backlog(
     provider=None,
     org=None,
     project=None,
-    output_format="markdown",
+    table=False,
     quick=False,
     refresh=False,
     status=False,
@@ -2707,7 +2796,6 @@ def prototype_generate_backlog(
     # Telemetry overrides
     cmd._telemetry_overrides = {
         "backlog_provider": provider,
-        "output_format": output_format,
         "items_pushed": result.items_pushed,
     }
 
@@ -2717,7 +2805,6 @@ def prototype_generate_backlog(
     return {
         "status": "generated",
         "provider": provider,
-        "format": output_format,
         "items_generated": result.items_generated,
         "items_pushed": result.items_pushed,
         "items_failed": result.items_failed,

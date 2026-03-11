@@ -40,6 +40,15 @@ TUI stage tree fix
 * **Consistent "no project" error message** — all commands now show the
   same red ``CLIError`` message when ``prototype.yaml`` is missing:
   *"No prototype project found. Run 'az prototype init'."*
+* **Replaced ``--output-format`` with ``--table`` / ``--report``** — the
+  ``analyze costs`` command shows the cost summary table by default,
+  ``--table`` shows the summary without saving a file, ``--report``
+  shows the full detailed report, and ``--json`` returns raw JSON.
+  The ``generate backlog`` command uses ``--table`` instead of
+  ``--output-format``.
+* **``--json`` on cost analysis returns full content** — ``--json`` now
+  suppresses console output and returns a structured JSON dict with the
+  full cost report in the ``content`` field for machine consumption.
 
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
