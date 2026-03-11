@@ -313,6 +313,7 @@ def prototype_init(
     template=None,
     environment="dev",
     model=None,
+    json_output=False,
 ):
     """Initialize a new prototype project."""
     from azext_prototype.agents.base import AgentContext
@@ -393,7 +394,7 @@ def _run_tui(app) -> None:
 
 @_quiet_output
 @track("prototype launch")
-def prototype_launch(cmd, stage=None):
+def prototype_launch(cmd, stage=None, json_output=False):
     """Launch the interactive TUI dashboard.
 
     Auto-detects the current project stage and launches the appropriate
@@ -422,6 +423,7 @@ def prototype_design(
     interactive=False,
     status=False,
     skip_discovery=False,
+    json_output=False,
 ):
     """Run the design stage.
 
@@ -511,7 +513,7 @@ def prototype_design(
 
 @_quiet_output
 @track("prototype build")
-def prototype_build(cmd, scope="all", dry_run=False, status=False, reset=False, auto_accept=False):
+def prototype_build(cmd, scope="all", dry_run=False, status=False, reset=False, auto_accept=False, json_output=False):
     """Run the build stage.
 
     Interactive by default — uses Claude Code-inspired bordered prompts,
@@ -587,6 +589,7 @@ def prototype_deploy(
     script_deploy_type="webapp",
     script_resource_group=None,
     script_registry=None,
+    json_output=False,
 ):
     """Run the deploy stage.
 
@@ -1034,7 +1037,7 @@ def prototype_status(cmd, detailed=False, json_output=False):
 
 @_quiet_output
 @track("prototype config show")
-def prototype_config_show(cmd):
+def prototype_config_show(cmd, json_output=False):
     """Display current configuration.
 
     Secret values (API keys, subscription IDs, tokens) stored in
@@ -1070,7 +1073,7 @@ def prototype_config_show(cmd):
 
 @_quiet_output
 @track("prototype config get")
-def prototype_config_get(cmd, key=None):
+def prototype_config_get(cmd, key=None, json_output=False):
     """Get a single configuration value by dot-separated key."""
     from azext_prototype.config import ProjectConfig
     from azext_prototype.ui.console import console
@@ -1095,7 +1098,7 @@ def prototype_config_get(cmd, key=None):
 
 @_quiet_output
 @track("prototype config set")
-def prototype_config_set(cmd, key=None, value=None):
+def prototype_config_set(cmd, key=None, value=None, json_output=False):
     """Set a configuration value."""
     from azext_prototype.ui.console import console
 
@@ -1318,7 +1321,7 @@ def _prompt_backlog_config(current_provider: str = "", current_org: str = "", cu
 
 @_quiet_output
 @track("prototype config init")
-def prototype_config_init(cmd):
+def prototype_config_init(cmd, json_output=False):
     """Interactive questionnaire to create prototype.yaml.
 
     Walks the user through standard project configuration questions.
@@ -1459,7 +1462,7 @@ def prototype_agent_list(cmd, show_builtin=True, detailed=False, json_output=Fal
 
 @_quiet_output
 @track("prototype agent add")
-def prototype_agent_add(cmd, name=None, file=None, definition=None):
+def prototype_agent_add(cmd, name=None, file=None, definition=None, json_output=False):
     """Add a custom agent.
 
     Interactive by default when neither ``--file`` nor ``--definition`` is
@@ -1734,7 +1737,7 @@ def _copy_yaml_with_name(source: Path, dest: Path, new_name: str) -> None:
 
 @_quiet_output
 @track("prototype agent override")
-def prototype_agent_override(cmd, name=None, file=None):
+def prototype_agent_override(cmd, name=None, file=None, json_output=False):
     """Override a built-in agent with validation."""
     if not name:
         raise CLIError("--name is required. Specify which built-in agent to override.")
@@ -1838,7 +1841,7 @@ def prototype_agent_show(cmd, name=None, detailed=False, json_output=False):
 
 @_quiet_output
 @track("prototype agent remove")
-def prototype_agent_remove(cmd, name=None):
+def prototype_agent_remove(cmd, name=None, json_output=False):
     """Remove a custom agent."""
     if not name:
         raise CLIError("--name is required.")
@@ -1882,7 +1885,9 @@ def prototype_agent_remove(cmd, name=None):
 
 @_quiet_output
 @track("prototype agent update")
-def prototype_agent_update(cmd, name=None, description=None, capabilities=None, system_prompt_file=None):
+def prototype_agent_update(
+    cmd, name=None, description=None, capabilities=None, system_prompt_file=None, json_output=False,
+):
     """Update an existing custom agent.
 
     Interactive by default — walks through the same prompts as ``agent add``
@@ -1968,7 +1973,7 @@ def prototype_agent_update(cmd, name=None, description=None, capabilities=None, 
 
 @_quiet_output
 @track("prototype agent test")
-def prototype_agent_test(cmd, name=None, prompt=None):
+def prototype_agent_test(cmd, name=None, prompt=None, json_output=False):
     """Send a test prompt to an agent and display the response.
 
     Requires a configured AI provider.
@@ -2007,7 +2012,7 @@ def prototype_agent_test(cmd, name=None, prompt=None):
 
 @_quiet_output
 @track("prototype agent export")
-def prototype_agent_export(cmd, name=None, output_file=None):
+def prototype_agent_export(cmd, name=None, output_file=None, json_output=False):
     """Export any agent (including built-in) as a YAML file."""
     if not name:
         raise CLIError("--name is required.")
@@ -2114,7 +2119,7 @@ def _analyze_inline_input(qa_agent, agent_context, project_dir: str, error_text:
 
 @_quiet_output
 @track("prototype analyze error")
-def prototype_analyze_error(cmd, input=None):
+def prototype_analyze_error(cmd, input=None, json_output=False):
     """Analyze an error and propose a fix.
 
     Accepts:
@@ -2166,7 +2171,7 @@ def prototype_analyze_error(cmd, input=None):
 
 @_quiet_output
 @track("prototype analyze costs")
-def prototype_analyze_costs(cmd, output_format="markdown", refresh=False):
+def prototype_analyze_costs(cmd, output_format="markdown", refresh=False, json_output=False):
     """Analyze architecture costs at Small/Medium/Large t-shirt sizes.
 
     Results are cached in ``.prototype/state/cost_analysis.yaml``.
@@ -2323,6 +2328,7 @@ def prototype_knowledge_contribute(
     draft=False,
     contribution_type="Pitfall",
     section=None,
+    json_output=False,
 ):
     """Submit a knowledge base contribution as a GitHub Issue.
 
@@ -2609,6 +2615,7 @@ def prototype_generate_backlog(
     refresh=False,
     status=False,
     push=False,
+    json_output=False,
 ):
     """Generate a backlog of user stories / issues from the architecture design.
 
@@ -2713,7 +2720,7 @@ def prototype_generate_backlog(
 
 @_quiet_output
 @track("prototype generate docs")
-def prototype_generate_docs(cmd, path=None):
+def prototype_generate_docs(cmd, path=None, json_output=False):
     """Generate documentation from templates.
 
     When design context is available, uses the doc-agent to populate
@@ -2761,7 +2768,7 @@ def prototype_generate_docs(cmd, path=None):
 
 @_quiet_output
 @track("prototype generate speckit")
-def prototype_generate_speckit(cmd, path=None):
+def prototype_generate_speckit(cmd, path=None, json_output=False):
     """Generate the spec-kit documentation bundle.
 
     When design context is available, uses the doc-agent to populate

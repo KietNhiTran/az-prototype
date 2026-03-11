@@ -19,6 +19,9 @@ Init improvements
 * **Fixed "Next: cd ..." hint** — the summary panel now shows the
   actual project directory name instead of always displaying the
   ``--name`` value.
+* **--json flag on all commands** — added ``json_output`` parameter to
+  every command function so the global ``--json`` / ``-j`` flag is
+  accepted on all 24 commands (previously only 3 accepted it).
 * **Naming env/zone_id derived from --environment** — ``naming.env``
   and ``naming.zone_id`` in ``prototype.yaml`` now reflect the chosen
   environment (dev→dev/zd, staging→stg/zs, prod→prd/zp) instead of
