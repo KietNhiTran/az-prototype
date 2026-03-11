@@ -650,7 +650,8 @@ class TestPrototypeDeployGenerateScripts:
 
         mock_dir.return_value = str(project_with_config)
         cmd = MagicMock()
-        # concept/apps exists but empty
+        # concept/apps exists but empty (not created by init; build creates it)
+        (project_with_config / "concept" / "apps").mkdir(parents=True, exist_ok=True)
         result = prototype_deploy(cmd, generate_scripts=True, json_output=True)
         assert result["status"] == "generated"
         assert len(result["scripts"]) == 0

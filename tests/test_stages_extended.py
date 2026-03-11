@@ -299,15 +299,12 @@ class TestInitStageExecution:
         project_dir = tmp_path / "my-project"
         stage._create_scaffold(project_dir)
 
-        assert (project_dir / "concept" / "apps").is_dir()
-        assert (project_dir / "concept" / "infra" / "terraform").is_dir()
-        assert (project_dir / "concept" / "infra" / "bicep").is_dir()
-        assert (project_dir / "concept" / "db" / "sql").is_dir()
-        assert (project_dir / "concept" / "db" / "cosmos").is_dir()
-        assert (project_dir / "concept" / "db" / "databricks").is_dir()
-        assert (project_dir / "concept" / "db" / "fabric").is_dir()
         assert (project_dir / "concept" / "docs").is_dir()
         assert (project_dir / ".prototype" / "agents").is_dir()
+        # infra, apps, db dirs are NOT created at init — only during build
+        assert not (project_dir / "concept" / "apps").exists()
+        assert not (project_dir / "concept" / "infra").exists()
+        assert not (project_dir / "concept" / "db").exists()
 
     def test_create_gitignore(self, tmp_path):
         stage = self._make_stage()

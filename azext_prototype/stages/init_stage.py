@@ -17,17 +17,6 @@ logger = logging.getLogger(__name__)
 # Project directory structure created by init
 PROJECT_SCAFFOLD = {
     "concept": {
-        "apps": {},
-        "infra": {
-            "terraform": {},
-            "bicep": {},
-        },
-        "db": {
-            "sql": {},
-            "cosmos": {},
-            "databricks": {},
-            "fabric": {},
-        },
         "docs": {},
     },
     ".prototype": {
