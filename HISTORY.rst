@@ -6,6 +6,24 @@ Release History
 0.2.1b5
 +++++++
 
+Backlog enrichment
+~~~~~~~~~~~~~~~~~~~
+* **Enriched backlog with full project context** — ``generate backlog``
+  now loads build stages, deploy status, cost analysis, and stage
+  completion (same context as spec-kit) for richer item generation.
+* **Completed work items** — items for already-built/deployed stages are
+  generated with ``status: done`` and grouped under a "Completed POC Work"
+  epic, with tasks marked as done.
+* **Production Readiness epic** — dedicated epic for POC-to-production
+  work (SKU upgrades, networking, CI/CD, monitoring, DR), separate from
+  generic "Deferred / Future Work".
+* **Azure DevOps hierarchy** — generation prompt requests Feature → User
+  Story → Task structure with ``children[]``; push code now creates Task
+  work items linked to their parent User Story.
+* **Dict task format** — tasks can be ``{"title": "...", "done": true}``
+  objects; GitHub issues render completed tasks as ``[x]``, DevOps
+  descriptions show checkbox markers.  String tasks remain supported.
+
 Spec-kit enrichment
 ~~~~~~~~~~~~~~~~~~~~
 * **Enriched spec-kit with full project context** — ``generate speckit``

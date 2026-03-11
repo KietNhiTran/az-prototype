@@ -2947,6 +2947,11 @@ def prototype_generate_backlog(
     if not design_context:
         raise CLIError("No architecture design found. Run 'az prototype design' first.")
 
+    # Enrich with build/deploy/cost context (same as speckit)
+    speckit_context = _load_speckit_context(project_dir)
+    if speckit_context:
+        design_context = f"{design_context}\n\n{speckit_context}" if design_context else speckit_context
+
     # Load scope from discovery
     scope = _load_discovery_scope(project_dir)
 
