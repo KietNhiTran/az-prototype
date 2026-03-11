@@ -52,6 +52,9 @@ TUI stage tree fix
 * **``generate docs`` default output moved to ``concept/docs/``** —
   documentation is now generated alongside other concept artifacts
   instead of a separate ``docs/`` directory at the project root.
+* **Normalized path separators in generate output** — displayed paths
+  now use forward slashes on all platforms instead of mixed separators
+  on Windows.
 
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
