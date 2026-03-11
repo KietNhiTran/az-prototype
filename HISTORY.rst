@@ -27,6 +27,17 @@ Init improvements
   environment (dev→dev/zd, staging→stg/zs, prod→prd/zp) instead of
   always defaulting to ``dev``/``zd``.
 
+TUI stage tree fix
+~~~~~~~~~~~~~~~~~~
+* **Fixed stage tree showing completed checkmark for unstarted stages** —
+  when launching with ``--stage design`` from an init-only project, the
+  Design stage now correctly shows as in-progress (●) instead of
+  completed (✓).  Stage status is now derived from detected state files,
+  not the target stage.
+* **Stage skip guard** — ``--stage deploy`` from an init-only project
+  now prints a warning and falls back to the next valid stage (e.g.
+  design) instead of allowing users to skip ahead.
+
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **Removed CLI "Next steps" from TUI** — the ``az prototype`` CLI
