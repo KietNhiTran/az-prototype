@@ -2695,7 +2695,8 @@ def _generate_templates(
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     console.print_file_list(generated)
-    console.print_dim(f"  {len(generated)} file(s) generated in {os.path.relpath(output_dir, project_dir)}/")
+    rel = Path(os.path.relpath(output_dir, project_dir)).as_posix()
+    console.print_dim(f"  {len(generated)} file(s) generated in {rel}/")
     return generated
 
 
@@ -2856,7 +2857,7 @@ def prototype_generate_docs(cmd, path=None, json_output=False):
         design_context=design_context,
         registry=registry,
     )
-    console.print_success(f"Documentation generated to {os.path.relpath(output_dir, project_dir)}/")
+    console.print_success(f"Documentation generated to {Path(os.path.relpath(output_dir, project_dir)).as_posix()}/")
     return {"status": "generated", "documents": generated, "output_dir": str(output_dir)}
 
 
@@ -2905,5 +2906,5 @@ def prototype_generate_speckit(cmd, path=None, json_output=False):
         design_context=design_context,
         registry=registry,
     )
-    console.print_success(f"Spec-kit generated to {os.path.relpath(output_dir, project_dir)}/")
+    console.print_success(f"Spec-kit generated to {Path(os.path.relpath(output_dir, project_dir)).as_posix()}/")
     return {"status": "generated", "templates": generated, "output_dir": str(output_dir)}
