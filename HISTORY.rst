@@ -56,6 +56,11 @@ TUI stage tree fix
   now use forward slashes on all platforms instead of mixed separators
   on Windows.  Also handles cross-mount ``--path`` values (e.g.
   ``Y:\output`` from a ``\\Mac\projects`` project) without crashing.
+* **Spec-kit generates its own templates** — ``generate speckit`` now
+  produces spec-kit-specific files (``constitution.md``, ``spec.md``,
+  ``plan.md``, ``tasks.md``) aligned with the `spec-kit
+  <https://github.com/github/spec-kit>`_ format instead of duplicating
+  the documentation templates.
 
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

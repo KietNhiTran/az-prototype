@@ -2591,10 +2591,17 @@ _DOC_TEMPLATES = {
     "COST_ESTIMATE.md": "COST_ESTIMATE.md",
 }
 
+_SPECKIT_TEMPLATES = {
+    "constitution.md": "constitution.md",
+    "spec.md": "spec.md",
+    "plan.md": "plan.md",
+    "tasks.md": "tasks.md",
+}
 
-def _get_templates_dir() -> Path:
-    """Return the path to the bundled doc templates directory."""
-    return Path(__file__).resolve().parent / "templates" / "docs"
+
+def _get_templates_dir(kind: str = "docs") -> Path:
+    """Return the path to a bundled templates subdirectory."""
+    return Path(__file__).resolve().parent / "templates" / kind
 
 
 def _render_template(template_text: str, project_config: dict) -> str:
@@ -2606,11 +2613,18 @@ def _render_template(template_text: str, project_config: dict) -> str:
     """
     from datetime import date
 
+    project = project_config.get("project", {})
+    iac = project_config.get("iac", {}).get("tool", "terraform")
+    naming = project_config.get("naming", {}).get("strategy", "simple")
+    env = project_config.get("project", {}).get("environment", "dev")
     replacements = {
-        "[PROJECT_NAME]": project_config.get("project", {}).get("name", "[PROJECT_NAME]"),
-        "[LOCATION]": project_config.get("project", {}).get("location", "[LOCATION]"),
+        "[PROJECT_NAME]": project.get("name", "[PROJECT_NAME]"),
+        "[LOCATION]": project.get("location", "[LOCATION]"),
         "[DATE]": str(date.today()),
-        "[CUSTOMER_NAME]": project_config.get("project", {}).get("customer", "[CUSTOMER_NAME]"),
+        "[CUSTOMER_NAME]": project.get("customer", "[CUSTOMER_NAME]"),
+        "[IAC_TOOL]": iac,
+        "[NAMING_STRATEGY]": naming,
+        "[ENVIRONMENT]": env,
     }
 
     for placeholder, value in replacements.items():
@@ -2628,18 +2642,25 @@ def _generate_templates(
     ai_provider=None,
     design_context: str = "",
     registry=None,
+    template_map: dict[str, str] | None = None,
+    template_kind: str = "docs",
 ) -> list[str]:
-    """Render doc templates into *output_dir*.
+    """Render templates into *output_dir*.
 
     Shared implementation for ``generate docs`` and ``generate speckit``.
+    *template_map* selects which templates to render (defaults to _DOC_TEMPLATES).
+    *template_kind* selects the subdirectory under ``templates/`` (docs or speckit).
     When *ai_provider* and *design_context* are available, uses the
     doc-agent to populate template placeholders with real content.
     Returns the list of generated file names.
     """
     from azext_prototype.ui.console import console
 
+    if template_map is None:
+        template_map = _DOC_TEMPLATES
+
     output_dir.mkdir(parents=True, exist_ok=True)
-    templates_dir = _get_templates_dir()
+    templates_dir = _get_templates_dir(template_kind)
     generated: list[str] = []
 
     # Resolve doc-agent if available
@@ -2651,7 +2672,7 @@ def _generate_templates(
         if doc_agents:
             doc_agent = doc_agents[0]
 
-    for template_name in _DOC_TEMPLATES:
+    for template_name in template_map:
         template_path = templates_dir / template_name
         if not template_path.exists():
             logger.warning("Template not found: %s", template_name)
@@ -2685,7 +2706,7 @@ def _generate_templates(
             except Exception as e:
                 logger.warning("AI population failed for %s: %s", template_name, e)
 
-        output_name = _DOC_TEMPLATES.get(template_name, template_name)
+        output_name = template_map.get(template_name, template_name)
         output_path = output_dir / output_name
         output_path.write_text(rendered, encoding="utf-8")
         generated.append(output_name)
@@ -2913,6 +2934,8 @@ def prototype_generate_speckit(cmd, path=None, json_output=False):
         ai_provider=ai_provider,
         design_context=design_context,
         registry=registry,
+        template_map=_SPECKIT_TEMPLATES,
+        template_kind="speckit",
     )
     console.print_success(f"Spec-kit generated to {_rel_path(output_dir, project_dir)}/")
     return {"status": "generated", "templates": generated, "output_dir": str(output_dir)}
