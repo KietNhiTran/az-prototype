@@ -37,6 +37,9 @@ TUI stage tree fix
 * **Stage skip guard** — ``--stage deploy`` from an init-only project
   now prints a warning and falls back to the next valid stage (e.g.
   design) instead of allowing users to skip ahead.
+* **Consistent "no project" error message** — all commands now show the
+  same red ``CLIError`` message when ``prototype.yaml`` is missing:
+  *"No prototype project found. Run 'az prototype init'."*
 
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -89,7 +89,7 @@ class DesignStage(BaseStage):
                 name="project_initialized",
                 description="Project must be initialized",
                 check_fn=lambda: Path("prototype.yaml").is_file(),
-                error_message="Run 'az prototype init' first.",
+                error_message="No prototype project found. Run 'az prototype init'.",
             ),
         ]
 

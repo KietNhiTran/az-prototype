@@ -59,6 +59,15 @@ def _quiet_output(fn):
     return wrapper
 
 
+_NO_PROJECT_MSG = "No prototype project found. Run 'az prototype init'."
+
+
+def _require_project(project_dir: str) -> None:
+    """Raise CLIError if prototype.yaml is missing."""
+    if not (Path(project_dir) / "prototype.yaml").is_file():
+        raise CLIError(_NO_PROJECT_MSG)
+
+
 def _get_project_dir() -> str:
     """Resolve the current project directory."""
     return str(Path.cwd().resolve())
@@ -404,9 +413,7 @@ def prototype_launch(cmd, stage=None, json_output=False):
 
     project_dir = _get_project_dir()
 
-    # Verify project is initialized
-    if not (Path(project_dir) / "prototype.yaml").is_file():
-        raise CLIError("Run 'az prototype init' first.")
+    _require_project(project_dir)
 
     app = PrototypeApp(start_stage=stage, project_dir=project_dir)
     _run_tui(app)
@@ -453,8 +460,7 @@ def prototype_design(
         from azext_prototype.ui.console import console
 
         project_dir = _get_project_dir()
-        if not (Path(project_dir) / "prototype.yaml").is_file():
-            raise CLIError("Run 'az prototype init' first.")
+        _require_project(project_dir)
 
         discovery_state = DiscoveryState(project_dir)
         if discovery_state.exists:
@@ -482,8 +488,7 @@ def prototype_design(
         return {"status": "displayed"}
 
     project_dir = _get_project_dir()
-    if not (Path(project_dir) / "prototype.yaml").is_file():
-        raise CLIError("Run 'az prototype init' first.")
+    _require_project(project_dir)
 
     # Resolve artifacts path to absolute before TUI takes over
     resolved_artifacts = str(Path(artifacts).resolve()) if artifacts else None
@@ -813,11 +818,8 @@ def prototype_status(cmd, detailed=False, json_output=False):
         config = _load_config(project_dir)
     except CLIError:
         if json_output:
-            return {"status": "not_initialized", "message": "No prototype project found. Run 'az prototype init'."}
-        from azext_prototype.ui.console import console
-
-        console.print_warning("No prototype project found. Run 'az prototype init'.")
-        return {"status": "not_initialized", "message": "No prototype project found. Run 'az prototype init'."}
+            return {"status": "not_initialized", "message": _NO_PROJECT_MSG}
+        raise CLIError(_NO_PROJECT_MSG)
 
     from azext_prototype.stages.build_state import BuildState
     from azext_prototype.stages.deploy_state import DeployState
