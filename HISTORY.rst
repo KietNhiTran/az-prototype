@@ -6,13 +6,19 @@ Release History
 0.2.1b5
 +++++++
 
-Leaner init scaffold
-~~~~~~~~~~~~~~~~~~~~~
+Init improvements
+~~~~~~~~~~~~~~~~~~
 * **Removed eager directory creation from init** — ``concept/apps/``,
   ``concept/infra/`` (terraform/, bicep/), and ``concept/db/`` (sql/,
   cosmos/, databricks/, fabric/) are no longer created during
   ``az prototype init``.  These directories are now created on demand
   by the build stage only when they are actually needed.
+* **Fixed --output-dir nesting** — ``--output-dir ./my-output`` now
+  uses the specified directory as the project root instead of creating
+  a ``name/`` subdirectory inside it.
+* **Fixed "Next: cd ..." hint** — the summary panel now shows the
+  actual project directory name instead of always displaying the
+  ``--name`` value.
 
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
