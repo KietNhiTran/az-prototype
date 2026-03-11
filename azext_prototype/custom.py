@@ -62,6 +62,14 @@ def _quiet_output(fn):
 _NO_PROJECT_MSG = "No prototype project found. Run 'az prototype init'."
 
 
+def _rel_path(path: str | Path, base: str | Path) -> str:
+    """Return a forward-slash relative path, falling back to absolute if cross-mount."""
+    try:
+        return Path(os.path.relpath(path, base)).as_posix()
+    except ValueError:
+        return Path(path).as_posix()
+
+
 def _require_project(project_dir: str) -> None:
     """Raise CLIError if prototype.yaml is missing."""
     if not (Path(project_dir) / "prototype.yaml").is_file():
@@ -2695,7 +2703,7 @@ def _generate_templates(
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     console.print_file_list(generated)
-    rel = Path(os.path.relpath(output_dir, project_dir)).as_posix()
+    rel = _rel_path(output_dir, project_dir)
     console.print_dim(f"  {len(generated)} file(s) generated in {rel}/")
     return generated
 
@@ -2857,7 +2865,7 @@ def prototype_generate_docs(cmd, path=None, json_output=False):
         design_context=design_context,
         registry=registry,
     )
-    console.print_success(f"Documentation generated to {Path(os.path.relpath(output_dir, project_dir)).as_posix()}/")
+    console.print_success(f"Documentation generated to {_rel_path(output_dir, project_dir)}/")
     return {"status": "generated", "documents": generated, "output_dir": str(output_dir)}
 
 
@@ -2906,5 +2914,5 @@ def prototype_generate_speckit(cmd, path=None, json_output=False):
         design_context=design_context,
         registry=registry,
     )
-    console.print_success(f"Spec-kit generated to {Path(os.path.relpath(output_dir, project_dir)).as_posix()}/")
+    console.print_success(f"Spec-kit generated to {_rel_path(output_dir, project_dir)}/")
     return {"status": "generated", "templates": generated, "output_dir": str(output_dir)}

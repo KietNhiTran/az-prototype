@@ -54,7 +54,8 @@ TUI stage tree fix
   instead of a separate ``docs/`` directory at the project root.
 * **Normalized path separators in generate output** — displayed paths
   now use forward slashes on all platforms instead of mixed separators
-  on Windows.
+  on Windows.  Also handles cross-mount ``--path`` values (e.g.
+  ``Y:\output`` from a ``\\Mac\projects`` project) without crashing.
 
 TUI post-design improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
